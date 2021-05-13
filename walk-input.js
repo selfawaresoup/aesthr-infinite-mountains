@@ -12,6 +12,7 @@ export const walkInput = (canvas, callback) => {
   canvas.addEventListener('mousedown', () => {
     active = true
     update()
+    draw()
   })
 
   canvas.addEventListener('mouseup', () => {
@@ -37,14 +38,7 @@ export const walkInput = (canvas, callback) => {
     outY = 0
   }
 
-  canvas.addEventListener("mousemove", ev => {
-    x = ev.clientX - left
-    y = ev.clientY - top
-
-    if (active) {
-      update()
-    }
-
+  const draw = () => {
     clear()
 
     ctx.strokeStyle = active ? 'purple' : 'lightgrey'
@@ -53,6 +47,17 @@ export const walkInput = (canvas, callback) => {
     ctx.moveTo(cX, cY)
     ctx.lineTo(x, y)
     ctx.stroke()
+  }
+
+  canvas.addEventListener("mousemove", ev => {
+    x = ev.clientX - left
+    y = ev.clientY - top
+
+    if (active) {
+      update()
+    }
+
+    draw()
   })
 
   return () => {

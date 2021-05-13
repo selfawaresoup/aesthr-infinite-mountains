@@ -4,10 +4,10 @@ import {
   disableAudioEntity,
   createAudioEnvironment,
   moveListenerTo,
-  noteFrequency,
-  addVectors,
-  scaleVector,
-} from './lib.js';
+  noteFrequency
+} from './audio.js';
+
+import {addVectors, scaleVector} from './vector.js';
 
 import { walkInput } from './walk-input.js';
 import { renderer } from './render.js';
