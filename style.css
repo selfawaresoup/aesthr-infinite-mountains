@@ -1,0 +1,21 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  text-align: center;
+}
+
+#renderer {
+  width: 400px;
+  height: 400px;
+
+  border: 1px solid green;
+}
+
+#walk-input {
+  width: 200px;
+  height: 200px;
+
+  border: 1px solid purple;
+}
