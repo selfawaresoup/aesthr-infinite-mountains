@@ -3,6 +3,8 @@ import {
   isUndefined
 } from './lib.js'
 
+const {pow, sqrt, sin, cos, PI} = Math
+
 export const isVector = n => v => {
   if (!Array.isArray(v)) {
     return false
@@ -69,4 +71,32 @@ export const scaleVector = (v, s) => v.map(n => n * s)
   const t = scaleVector([1,2], 5)
   console.assert(t[0] === 5, 'scaleVector X')
   console.assert(t[1] === 10, 'scaleVector Y')
+}
+
+
+
+export const vectorLength = v => sqrt(pow(v[0], 2) + pow(v[1], 2))
+
+{
+  console.assert(vectorLength([1,0]) === 1, 'vectorLength')
+  console.assert(vectorLength([3,4]) === 5, 'vectorLength')
+  console.assert(vectorLength([0,0]) === 0, 'vectorLength')
+}
+
+
+
+export const rotate2DVector = ([x, y], th) => {
+  return [
+      x * cos(th) - y * sin(th),
+      x * sin(th) + y * cos(th)
+  ]
+}
+
+{
+  const t1 = rotate2DVector([1,0], PI)
+  console.assert(t1[0] === -1, 'rotate2DVector')
+  console.assert(t1[1] < 1e-15, 'rotate2DVector')
+  const t2 = rotate2DVector([1,0], PI/2)
+  console.assert(t2[0] < 1e-15, 'rotate2DVector')
+  console.assert(t2[1] === 1, 'rotate2DVector')
 }

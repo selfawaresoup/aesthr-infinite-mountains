@@ -1,13 +1,15 @@
 import {
-  validateVector2
+  validateVector2,
+  rotate2DVector,
+  addVectors
 } from './vector.js';
 
 import { isFunction } from './lib.js';
 
 const setAudioListenerPosition = (ctx, lst, v) => {
   validateVector2(v)
-  lst.positionX.setTargetAtTime(v[0], ctx.currentTime, 0.02)
-  lst.positionZ.setTargetAtTime(v[1], ctx.currentTime, 0.02)
+  lst.positionX.setTargetAtTime(v[0], ctx.currentTime, 0.01)
+  lst.positionZ.setTargetAtTime(v[1], ctx.currentTime, 0.01)
   return lst
 }
 
@@ -15,32 +17,22 @@ const setAudioPannerPosition = setAudioListenerPosition
 
 
 
-const setAudioListenerDirection = (lst, v) => {
+const setAudioListenerDirection = (ctx, lst, v) => {
   validateVector2(v)
-  lst.forwardX.value = v[0]
-  lst.forwardZ.value = v[1]
+  lst.forwardX.setTargetAtTime(v[0], ctx.currentTime, 0.01)
+  lst.forwardZ.setTargetAtTime(v[1], ctx.currentTime, 0.01)
   return lst
 }
 
-{
-  const testLst = {
-    forwardX: {value: 0},
-    forwardZ: {value: 0}
-  }
-  setAudioListenerDirection(testLst, [1,2])
-  console.assert(testLst.forwardX.value === 1, 'setAudioListenerDirection X')
-  console.assert(testLst.forwardZ.value === 2, 'setAudioListenerDirection Z')
-}
 
 
-
-const createPanner = (ctx, maxDistance = 80) => {
+const createPanner = (ctx) => {
   const pan = ctx.createPanner()
-  pan.panningModel = 'HRTF'
-  pan.distanceModel = 'inverse'
-  pan.refDistance = 1
-  pan.maxDistance = maxDistance
-  pan.rolloffFactor = 1
+  pan.panningModel = 'equalpower'
+  pan.distanceModel = 'exponential'
+  pan.refDistance = 6
+  pan.maxDistance = 80
+  pan.rolloffFactor = 3
   pan.coneInnerAngle = 360
   pan.coneOuterAngle = 0
   pan.coneOuterGain = 0
@@ -161,13 +153,16 @@ export const createAudioEnvironment = () => {
   const lst = ctx.listener
 
   setAudioListenerPosition(ctx, lst, [0,0])
-  setAudioListenerDirection(lst, [0,-1])
+  setAudioListenerDirection(ctx, lst, [0,-1])
 
   const gain = createGain(ctx, 0.5)
   gain.connect(ctx.destination)
 
   return {
-    listener: [0,0],
+    listener: {
+      position: [0,0],
+      orientation: [0,1]
+    },
     audio: {
       ctx,
       lst,
@@ -179,8 +174,27 @@ export const createAudioEnvironment = () => {
 
 
 export const moveListenerTo = (env, vec) => {
-  env.listener = vec
-  setAudioListenerPosition(env.audio.ctx, env.audio.lst, env.listener)
+  env.listener.position = vec
+  setAudioListenerPosition(env.audio.ctx, env.audio.lst, env.listener.position)
+}
+
+export const moveListenerBy = (env, vec) => {
+  const a = env.listener.position
+  const b = addVectors(a, vec)
+  env.listener.position = b
+  setAudioListenerPosition(env.audio.ctx, env.audio.lst, b)
+}
+
+export const rotateListenerBy = (env, th) => {
+  const a = env.listener.orientation
+  const b = rotate2DVector(a, th)
+  env.listener.orientation = b
+  setAudioListenerDirection(env.audio.ctx, env.audio.lst, b)
+}
+
+export const rotateListenerTo = (env, vec) => {
+  env.listener.orientation = vec
+  setAudioListenerDirection(env.audio.ctx, env.audio.lst, vec)
 }
 
 

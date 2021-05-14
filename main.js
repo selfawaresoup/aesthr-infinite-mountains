@@ -3,8 +3,9 @@ import {
   enableAudioEntity,
   disableAudioEntity,
   createAudioEnvironment,
-  moveListenerTo,
-  noteFrequency
+  moveListenerBy,
+  noteFrequency,
+  rotateListenerTo
 } from './audio.js';
 
 import {addVectors, scaleVector} from './vector.js';
@@ -39,17 +40,16 @@ const entities = [
   return ent
 })
 
-const inputCoords = walkInput(document.querySelector('#walk-input'))
+const input = walkInput(document.querySelector('#walk-input'))
 const render = renderer(document.querySelector('#renderer'))
 
-let listener = [0, 0]
-
 const main = () => {
-  listener = addVectors(listener, scaleVector(inputCoords(), 4))
-  //console.log(listener)
-  moveListenerTo(aEnv, listener)
+  const moveVec = scaleVector(input(), 4)
+  
+  moveListenerBy(aEnv, moveVec)
+  rotateListenerTo(aEnv, moveVec)
   render.clear()
-  render.listener(listener)
+  render.listener(aEnv.listener)
   entities.forEach(ent => render.entity(ent.position))
 }
 
