@@ -152,7 +152,7 @@ export const createAudioEnvironment = () => {
   const ctx = new AudioContext()
   const lst = ctx.listener
 
-  setAudioListenerPosition(ctx, lst, [0,0])
+  setAudioListenerPosition(ctx, lst, [1,1])
   setAudioListenerDirection(ctx, lst, [0,-1])
 
   const gain = createGain(ctx, 0.5)
@@ -160,7 +160,7 @@ export const createAudioEnvironment = () => {
 
   return {
     listener: {
-      position: [0,0],
+      position: [1,1],
       orientation: [0,1]
     },
     audio: {

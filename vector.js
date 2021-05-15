@@ -66,6 +66,16 @@ export const addVectors = (vA, vB) => vA.map((n, i) => n + vB[i])
 
 
 
+export const subtractVectors = (vA, vB) => vA.map((n, i) => n - vB[i])
+
+{
+  const t = subtractVectors([8,5], [5,9])
+  console.assert(t[0] === 3, "subtractVectors X")
+  console.assert(t[1] === -4, "subtractVectors Y")
+}
+
+
+
 export const scaleVector = (v, s) => v.map(n => n * s)
 {
   const t = scaleVector([1,2], 5)
@@ -99,4 +109,24 @@ export const rotate2DVector = ([x, y], th) => {
   const t2 = rotate2DVector([1,0], PI/2)
   console.assert(t2[0] < 1e-15, 'rotate2DVector')
   console.assert(t2[1] === 1, 'rotate2DVector')
+}
+
+
+
+export const equalVector = (va, vb) => {
+  if (va.length !== vb.length) {
+    return false
+  }
+
+  if (va.find( (a, i) => a !== vb[i])) {
+    return false
+  }
+
+  return true
+}
+
+{
+  console.assert(equalVector([1, 0], [1, 0]), 'equalVector')
+  console.assert(!equalVector([ 0, 0], [0, 0, 0]), 'equalVector')
+  console.assert(!equalVector([1, 0], [2, 0]), 'equalVector')
 }
