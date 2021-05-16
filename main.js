@@ -12,7 +12,8 @@ import {scaleVector} from './vector.js';
 import {
   circleCells,
   cellsInCircle,
-  cellsNotInCircle
+  cellsNotInCircle,
+  gridValue
 } from './grid.js';
 
 import { walkInput } from './walk-input.js';
@@ -53,7 +54,7 @@ let activeCells = []
 const main = () => {
   const moveVec = scaleVector(input(), 8)
   const oldPosition = aEnv.listener.position
-  const range = 100
+  const range = 80
   
   moveListenerBy(aEnv, moveVec)
   rotateListenerTo(aEnv, moveVec)
@@ -61,10 +62,12 @@ const main = () => {
   render.grid()
 
   const newPosition = aEnv.listener.position
-  const cells = circleCells(aEnv.listener.position, range)
-  const activatingCells = cellsNotInCircle(cells, oldPosition, range)
+
+  const activatingCells = cellsNotInCircle(circleCells(newPosition, range), oldPosition, range)
+    .filter(c => gridValue(c) > 9000)
   const deactivatingCells = cellsNotInCircle(activeCells, newPosition, range)
-  activeCells = cells
+  
+  activeCells = cellsInCircle(activeCells, newPosition, range).concat(activatingCells)
 
   render.cells(activeCells, 'gray')
   render.cells(activatingCells, 'lightgreen')

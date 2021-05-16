@@ -1,4 +1,5 @@
 import {vectorLength, addVectors, subtractVectors} from './vector.js';
+import {random2} from './lib.js';
 
 const {pow, floor} = Math
 
@@ -22,31 +23,6 @@ const cellOnPosition = vec => vec.map(x => {
   console.assert(t2[0] === 20, 'cellOnPosition [21, -17]')
   console.assert(t2[1] === -20, 'cellOnPosition [21, -17]')
 }
-
-
-
-// export const circleCells = (vec, r) => {
-//   const center = cellOnPosition(vec)
-//   const gr = r - (r % gridSize) + gridSize
-
-//   const cells = []
-//   for (let y = -gr; y <= gr; y += gridSize) {
-//     for (let x = -gr; x <= gr; x += gridSize) {
-//       const localVec = [x, y]
-//       if (vectorLength(localVec) < r) {
-//         cells.push(addVectors(localVec, center))
-//       }
-//     }
-//   }
-
-//   return cells
-// }
-
-// {
-//   const c = circleCells([0,0], 20)
-//   //console.assert(c.length === 25, 'circleCells')
-// }
-
 
 
 const isCellInCircle = (center, r) => c => vectorLength(subtractVectors(c, center)) <= r
@@ -74,4 +50,4 @@ export const circleCells = (vec, r) => {
   }).filter(isCellInCircle(vec, r))
 }
 
-circleCells([0,0], 100)
+export const gridValue = vec => random2(vec[0], vec[1], 10000)
