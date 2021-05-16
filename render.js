@@ -33,8 +33,11 @@ export const renderer = canvas => {
     ctx.stroke()
   }
 
-  const entity = ([x,y]) => {
-    ctx.fillStyle = 'green'
+  const entity = ([x,y], v) => {
+    ctx.strokeStyle = 'green'
+    ctx.strokeRect(cx + x, cy + y, 10, 10)
+
+    ctx.fillStyle = `rgb(0, ${v}, 0)`
     ctx.fillRect(cx + x, cy + y, 10, 10)
   }
 

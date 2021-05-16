@@ -3,7 +3,7 @@ import {
   isUndefined
 } from './lib.js'
 
-const {pow, sqrt, sin, cos, PI} = Math
+const {pow, sqrt, sin, cos, PI, atan2} = Math
 
 export const isVector = n => v => {
   if (!Array.isArray(v)) {
@@ -22,13 +22,9 @@ export const isVector = n => v => {
 }
 
 export const isVector2 = isVector(2)
-export const isVector3 = isVector(3)
+
 {
   console.assert(isVector2([0,0]) === true, 'isVector2 ok')
-  console.assert(isVector3([0,0,0]) === true, 'isVector3 ok')
-  console.assert(isVector3([0,0]) === false, 'isVector3 with wrong length')
-  console.assert(isVector3([0,0, '']) === false, 'isVector3 with wrong type')
-  console.assert(isVector3([0,0, 'a']) === false, 'isVector3 with wrong type')
 }
 
 
@@ -111,6 +107,10 @@ export const rotate2DVector = ([x, y], th) => {
   console.assert(t2[1] === 1, 'rotate2DVector')
 }
 
+
+export const vectorAngle = vec => {
+  return atan2(vec[0], vec[1])
+}
 
 
 export const equalVector = (va, vb) => {

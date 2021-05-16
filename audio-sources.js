@@ -61,11 +61,15 @@ export const noteByNumber = n => {
 }
 
 export const createAudioSource = (ctx, seed) => {
-  const type = 1
+  const type = 4//random1(seed, 6)
 
   return [
     createConstantSine,
-    createPulsingSine
+    createPulsingSine,
+    createPulsingFilteredSquare,
+    createPingingSine,
+    createPingingSine,
+    createPingingSine
   ][type](ctx, seed)
 }
 
@@ -84,16 +88,19 @@ const createConstantSine = (ctx, seed) => {
 }
 
 const createPulsingSine = (ctx, seed) => {
+  const r1 = random1(seed, 10)
+  const r2 = random1(r1, 20)
+
   const baseFreq = ctx.createConstantSource()
   baseFreq.offset.value = noteByNumber(seed)
   baseFreq.start()
 
   const lfo = ctx.createOscillator()
   lfo.type = 'sine'
-  lfo.frequency.value = random1(seed, 10)
+  lfo.frequency.value = r1
 
   const attenuator = ctx.createGain()
-  attenuator.gain.value = 20
+  attenuator.gain.value = 5 + r2
 
   lfo.connect(attenuator)
   lfo.start()
@@ -106,4 +113,62 @@ const createPulsingSine = (ctx, seed) => {
   attenuator.connect(osc.frequency)
 
   return [osc, lfo, baseFreq, attenuator]
+}
+
+const createPulsingFilteredSquare = (ctx, seed) => {
+  const r1 = random1(seed, 10)
+  const r2 = random1(r1, 50) + 5
+  const r3 = random1(r2, 1000) + 50
+
+  const osc = ctx.createOscillator()
+  osc.type = 'square'
+  osc.frequency.value = noteByNumber(seed)
+  osc.start()
+
+  const baseFilterFreq = ctx.createConstantSource()
+  baseFilterFreq.offset.value = r3
+  baseFilterFreq.start()
+
+  const lfo = ctx.createOscillator()
+  lfo.type = 'sine'
+  lfo.frequency.value = r1
+
+  const attenuator = ctx.createGain()
+  attenuator.gain.value = r2
+
+  lfo.connect(attenuator)
+  lfo.start()
+
+  const filter = ctx.createBiquadFilter()
+
+  baseFilterFreq.connect(filter.frequency)
+  attenuator.connect(filter.frequency)
+
+  osc.connect(filter)
+
+  return [filter, lfo, baseFilterFreq, attenuator, osc]
+}
+
+const createPingingSine = (ctx, seed) => {
+  const r1 = random1(seed, 5000) + 500
+  const r2 = random1(r1, 1000) + 500
+
+  const freq = noteByNumber(seed)
+  const osc = createOscillator(ctx, freq)
+
+  const gain = ctx.createGain()
+  gain.gain.value = 0
+
+  osc.connect(gain)
+
+  const timeout = setInterval(() => {
+    gain.gain.setTargetAtTime(2, ctx.currentTime, 0.01)
+    gain.gain.setTargetAtTime(0, ctx.currentTime + 0.1, r2 / 1000)
+  }, r1)
+
+  const timer = {
+    stop: () => clearInterval(timeout)
+  }
+
+  return [gain, osc, timer]
 }

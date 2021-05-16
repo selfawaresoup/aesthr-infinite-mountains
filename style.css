@@ -13,8 +13,8 @@ body {
   border: 1px solid green;
 }
 
-#walk-input {
-  width: 200px;
+#camera {
+  width: 400px;
   height: 200px;
 
   border: 1px solid purple;

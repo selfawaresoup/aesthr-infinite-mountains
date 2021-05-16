@@ -4,9 +4,11 @@ import {
   addVectors
 } from './vector.js';
 
-import { isFunction } from './lib.js';
+import { isFunction, random1 } from './lib.js';
 
 import { createAudioSource } from './audio-sources.js';
+
+const { max } = Math
 
 const setAudioListenerPosition = (ctx, lst, v) => {
   validateVector2(v)
@@ -32,9 +34,9 @@ const createPanner = (ctx) => {
   const pan = ctx.createPanner()
   pan.panningModel = 'equalpower'
   pan.distanceModel = 'exponential'
-  pan.refDistance = 6
+  pan.refDistance = 1
   pan.maxDistance = 80
-  pan.rolloffFactor = 2.5
+  pan.rolloffFactor = 1.6
   pan.coneInnerAngle = 360
   pan.coneOuterAngle = 0
   pan.coneOuterGain = 0
@@ -56,11 +58,13 @@ const createGain = (ctx, g = 0.5) => {
 
 export const createAudioEntity = (position, seed) => {
   validateVector2(position)
+  const g = random1(seed, 1000) / 1000 + 0.2
+
   return {
     position: position,
     seed,
     enabled: false,
-    gain: 0.5,
+    gain: g,
     type: 'basic-sine',
     options: {
       freq: 440
@@ -68,15 +72,31 @@ export const createAudioEntity = (position, seed) => {
     audio: {
       panner: null,
       gain: null,
-      analyzer: null,
+      analyser: null,
       nodes: []
     }
   }
 }
 
 
+const createAnalyser = ctx => {
+  const analyser = ctx.createAnalyser()
+  analyser.fftSize = 32
+  return analyser
+}
 
-const fadeInTime = 300
+
+export const meter = ent => {
+  const { analyser } = ent.audio
+  var bufferLength = analyser.frequencyBinCount;
+  var dataArray = new Uint8Array(bufferLength);
+  analyser.getByteFrequencyData(dataArray);
+
+  return dataArray.reduce((carry, n) => max(carry, n), 0)
+}
+
+
+
 export const enableAudioEntity = (env, ent) => {
   const { ctx } = env.audio
   const pan = createPanner(ctx)
@@ -85,18 +105,19 @@ export const enableAudioEntity = (env, ent) => {
   const source = createAudioSource(ctx, ent.seed)
   const sourceOutput = source[0]
   const gain = createGain(ctx, 0)
-  const analyzer = ctx.createAnalyser()
 
+  const analyser = createAnalyser(ctx)
+  
   sourceOutput.connect(gain)
   gain.connect(pan)
-  gain.connect(analyzer)
+  gain.connect(analyser)
   pan.connect(env.audio.gain)
-
-  gain.gain.exponentialRampToValueAtTime(ent.gain, ctx.currentTime + fadeInTime / 1000)
+  
+  gain.gain.setTargetAtTime(ent.gain, env.audio.ctx.currentTime, 0.2)
 
   ent.audio.panner = pan
   ent.audio.gain = gain
-  ent.audio.analyzer = analyzer
+  ent.audio.analyser = analyser
   ent.audio.nodes = [...source]
 }
 
@@ -117,11 +138,10 @@ const disconnectNode = node => {
 }
 
 
-const fadeOutTime = 200
 export const disableAudioEntity = (env, ent) => {
-  const nodes = [ent.audio.panner, ent.audio.gain, ent.audio.analyzer, ...ent.audio.nodes]
+  const nodes = [ent.audio.panner, ent.audio.gain, ent.audio.analyser, ...ent.audio.nodes]
 
-  ent.audio.gain.gain.linearRampToValueAtTime(0, env.audio.ctx.currentTime + fadeOutTime/1000)
+  ent.audio.gain.gain.setTargetAtTime(0, env.audio.ctx.currentTime, 0.4)
 
   ent.audio.panner = null,
   ent.audio.gain = null,
@@ -130,7 +150,7 @@ export const disableAudioEntity = (env, ent) => {
   const timer = setTimeout(() => {
     clearTimeout(timer)
     nodes.forEach(disconnectNode)
-  }, fadeOutTime)
+  }, 2000)
 
   return ent
 }
@@ -144,8 +164,17 @@ export const createAudioEnvironment = () => {
   setAudioListenerPosition(ctx, lst, [1,1])
   setAudioListenerDirection(ctx, lst, [0,-1])
 
-  const gain = createGain(ctx, 0.5)
-  gain.connect(ctx.destination)
+  const gain = createGain(ctx, 1)
+
+  const compressor = ctx.createDynamicsCompressor()
+  compressor.threshold.setValueAtTime(-50, ctx.currentTime)
+  compressor.knee.setValueAtTime(40, ctx.currentTime)
+  compressor.ratio.setValueAtTime(12, ctx.currentTime)
+  compressor.attack.setValueAtTime(0, ctx.currentTime)
+  compressor.release.setValueAtTime(0.25, ctx.currentTime)
+
+  gain.connect(compressor)
+  compressor.connect(ctx.destination)
 
   return {
     listener: {

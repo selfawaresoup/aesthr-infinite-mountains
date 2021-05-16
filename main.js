@@ -4,10 +4,11 @@ import {
   disableAudioEntity,
   createAudioEnvironment,
   moveListenerBy,
-  rotateListenerTo
+  rotateListenerTo,
+  meter
 } from './audio.js';
 
-import {scaleVector} from './vector.js';
+import {scaleVector, vectorAngle} from './vector.js';
 import {
   circleCells,
   cellsInCircle,
@@ -18,7 +19,7 @@ import {
 
 import { walkInput } from './walk-input.js';
 import { renderer } from './render.js';
-
+import { camera } from './camera.js'
 
 const aEnv = createAudioEnvironment()
 
@@ -57,12 +58,13 @@ const debugStats = () => {
 
 const input = walkInput(document.querySelector('#renderer'))
 const render = renderer(document.querySelector('#renderer'))
+const cameraRender = camera(document.querySelector('#camera'))
 const debug = document.querySelector('#debug-stats')
 
 const main = () => {
   const moveVec = scaleVector(input(), 8)
   const oldPosition = aEnv.listener.position
-  const range = 80
+  const range = 120
   
   moveListenerBy(aEnv, moveVec)
   rotateListenerTo(aEnv, moveVec)
@@ -75,7 +77,14 @@ const main = () => {
   activateEntities(oldPosition, newPosition, range)
   
   render.listener(aEnv.listener)
-  activeEntities.forEach(ent => render.entity(ent.position))
+  cameraRender.clear()
+
+  activeEntities.forEach(ent => {
+    render.entity(ent.position, meter(ent))  
+    cameraRender.entity(aEnv, ent)
+  })
+
+
 
   debugStats()
 }
