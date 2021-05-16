@@ -35,9 +35,7 @@ export const renderer = canvas => {
 
   const entity = ([x,y]) => {
     ctx.fillStyle = 'green'
-    ctx.beginPath();
-    ctx.arc(cx + x, cy + y, 8, 0, 360);
-    ctx.fill()
+    ctx.fillRect(cx + x, cy + y, 10, 10)
   }
 
   const grid = () => {
