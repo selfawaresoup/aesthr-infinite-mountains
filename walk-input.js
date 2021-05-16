@@ -12,7 +12,7 @@ export const walkInput = (canvas, callback) => {
   canvas.addEventListener('mousedown', () => {
     active = true
     update()
-    draw()
+    //draw()
   })
 
   canvas.addEventListener('mouseup', () => {
@@ -22,7 +22,7 @@ export const walkInput = (canvas, callback) => {
   
   canvas.addEventListener('mouseleave', () => {
     release()
-    clear()
+    //clear()
   })
 
   const clear = () => ctx.clearRect(0, 0, width, height)
@@ -57,7 +57,7 @@ export const walkInput = (canvas, callback) => {
       update()
     }
 
-    draw()
+    //draw()
   })
 
   return () => {

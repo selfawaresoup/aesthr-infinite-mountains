@@ -19,3 +19,10 @@ body {
 
   border: 1px solid purple;
 }
+
+#debug-stats {
+  width: 400px;
+  margin: 0 auto;
+  font-family: monospace;
+  text-align: left;
+}

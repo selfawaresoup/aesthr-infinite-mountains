@@ -25,8 +25,8 @@ const cellOnPosition = vec => vec.map(x => {
 }
 
 
-const isCellInCircle = (center, r) => c => vectorLength(subtractVectors(c, center)) <= r
-const isCellNotInCircle = (center, r) => c => vectorLength(subtractVectors(c, center)) > r
+export const isCellInCircle = (center, r) => c => vectorLength(subtractVectors(c, center)) <= r
+export const isCellNotInCircle = (center, r) => c => vectorLength(subtractVectors(c, center)) > r
 
 export const cellsInCircle = (cells, center, r) => cells.filter(isCellInCircle(center, r))
 export const cellsNotInCircle = (cells, center, r) => cells.filter(isCellNotInCircle(center, r))
@@ -50,4 +50,10 @@ export const circleCells = (vec, r) => {
   }).filter(isCellInCircle(vec, r))
 }
 
-export const gridValue = vec => random2(vec[0], vec[1], 10000)
+
+const gridValueOffset = 17000
+const gridValueRange = 1000
+export const gridValue = vec => {
+  const r = random2(vec[0], vec[1], gridValueOffset + gridValueRange) - gridValueOffset
+  return r > 0 ? r : 0
+}

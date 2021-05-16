@@ -223,7 +223,7 @@ const frequencyIndex = note => {
     case "D#":
     case "Eb": return 3
     case  "E": return 4
-    case  "b": return 5
+    case  "F": return 5
     case "F#":
     case "Gb": return 6
     case  "G": return 7
@@ -249,3 +249,10 @@ export const noteFrequency = (note, octave = 4) => {
   console.assert(noteFrequency('C', 8) === 4186.08, 'noteFrequency C8')
 }
 
+const scale = ["D", "E", "F", "G","A", "Bb", "C"]
+export const noteByNumber = n => {
+  const note = scale[n % 7]
+  const octave = 2 + n % 4
+
+  return noteFrequency(note, octave)
+}

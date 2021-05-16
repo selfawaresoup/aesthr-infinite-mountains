@@ -5,7 +5,8 @@ import {
   createAudioEnvironment,
   moveListenerBy,
   noteFrequency,
-  rotateListenerTo
+  rotateListenerTo,
+  noteByNumber
 } from './audio.js';
 
 import {scaleVector} from './vector.js';
@@ -13,6 +14,7 @@ import {
   circleCells,
   cellsInCircle,
   cellsNotInCircle,
+  isCellNotInCircle,
   gridValue
 } from './grid.js';
 
@@ -22,34 +24,43 @@ import { renderer } from './render.js';
 
 const aEnv = createAudioEnvironment()
 
+let activeEntities = []
 
-const entities = [
-  // [[-90, -90], "C", 3],
-  // [[-80, -95], "C", 2],
-  // [[-85, -75], "G", 3],
+const activateEntities = (oldPosition, newPosition, range) => {
+  const activatingCells = cellsNotInCircle(circleCells(newPosition, range), oldPosition, range)
 
-  // [[-50, 0], "C", 4],
-  // [[0, 50], "Eb", 4],
-  // [[30, 30], "G", 4],
-  // [[40, -30], "Bb", 4],
-  // [[60, 80], "Bb", 3],
-  // [[-75, 10], "C", 3],
-  // [[-95, 20], "Eb", 3],
-  // [[-65, -10], "G", 3],
+  activatingCells.forEach(c => {
+    const v = gridValue(c)
+    if (v > 0) {
+      const ent = createAudioEntity(c)
+      ent.options.freq = noteByNumber(v)
+      activeEntities.push(ent)
+      enableAudioEntity(aEnv, ent)
+    }
+  })
+}
 
-  // [[15, 75], "D", 4],
-].map(e => {
-  const ent = createAudioEntity(e[0])
-  ent.options.freq = noteFrequency(e[1], e[2])
-  enableAudioEntity(aEnv, ent)
+const deactivateEntities = (newPosition, range) => {
+  const remaining = []
+  activeEntities.forEach(ent => {
+    if (isCellNotInCircle(newPosition, range)(ent.position)) {
+      disableAudioEntity(ent)
+    } else {
+      remaining.push(ent)
+    }
+  })
+  
+  activeEntities = remaining
+}
 
-  return ent
-})
 
-const input = walkInput(document.querySelector('#walk-input'))
+const debugStats = () => {
+  debug.textContent = `activeEntities: ${activeEntities.length}`
+}
+
+const input = walkInput(document.querySelector('#renderer'))
 const render = renderer(document.querySelector('#renderer'))
-
-let activeCells = []
+const debug = document.querySelector('#debug-stats')
 
 const main = () => {
   const moveVec = scaleVector(input(), 8)
@@ -60,21 +71,16 @@ const main = () => {
   rotateListenerTo(aEnv, moveVec)
   render.clear()
   render.grid()
-
-  const newPosition = aEnv.listener.position
-
-  const activatingCells = cellsNotInCircle(circleCells(newPosition, range), oldPosition, range)
-    .filter(c => gridValue(c) > 9000)
-  const deactivatingCells = cellsNotInCircle(activeCells, newPosition, range)
   
-  activeCells = cellsInCircle(activeCells, newPosition, range).concat(activatingCells)
-
-  render.cells(activeCells, 'gray')
-  render.cells(activatingCells, 'lightgreen')
-  render.cells(deactivatingCells, 'red')
-
+  const newPosition = aEnv.listener.position
+  
+  deactivateEntities(newPosition, range)
+  activateEntities(oldPosition, newPosition, range)
+  
   render.listener(aEnv.listener)
-  entities.forEach(ent => render.entity(ent.position))
+  activeEntities.forEach(ent => render.entity(ent.position))
+
+  debugStats()
 }
 
 setInterval(main, 1000/30)
