@@ -4,9 +4,7 @@ import {
   disableAudioEntity,
   createAudioEnvironment,
   moveListenerBy,
-  noteFrequency,
-  rotateListenerTo,
-  noteByNumber
+  rotateListenerTo
 } from './audio.js';
 
 import {scaleVector} from './vector.js';
@@ -32,8 +30,7 @@ const activateEntities = (oldPosition, newPosition, range) => {
   activatingCells.forEach(c => {
     const v = gridValue(c)
     if (v > 0) {
-      const ent = createAudioEntity(c)
-      ent.options.freq = noteByNumber(v)
+      const ent = createAudioEntity(c, v)
       activeEntities.push(ent)
       enableAudioEntity(aEnv, ent)
     }
@@ -44,7 +41,7 @@ const deactivateEntities = (newPosition, range) => {
   const remaining = []
   activeEntities.forEach(ent => {
     if (isCellNotInCircle(newPosition, range)(ent.position)) {
-      disableAudioEntity(ent)
+      disableAudioEntity(aEnv, ent)
     } else {
       remaining.push(ent)
     }
