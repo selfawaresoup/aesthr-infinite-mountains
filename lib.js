@@ -1,4 +1,4 @@
-const { abs } = Math
+const { abs, pow, floor } = Math
 
 export const isUndefined = x => typeof x === 'undefined'
 
@@ -32,3 +32,8 @@ const prime4 = 912784895021
 
 export const random1 = (a, bound) => abs(((prime1 * a + prime3) ^ prime4) % bound)
 export const random2 = (a, b, bound) => abs(((prime1 * a + prime2 * b + prime3) ^ prime4) % bound)
+
+export const round = (n, d) => {
+  const factor = pow(10, d)
+  return floor(n * factor) / factor
+}

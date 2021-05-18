@@ -52,7 +52,7 @@ export const validateVector2 = v => {
 
 
 
-export const addVectors = (vA, vB) => vA.map((n, i) => n + vB[i])
+export const addVectors = (vA, vB) => [vA[0] + vB[0], vA[1] + vB[1]]
 
 {
   const t = addVectors([1,2], [5,6])
@@ -62,7 +62,7 @@ export const addVectors = (vA, vB) => vA.map((n, i) => n + vB[i])
 
 
 
-export const subtractVectors = (vA, vB) => vA.map((n, i) => n - vB[i])
+export const subtractVectors = (vA, vB) => [vA[0] - vB[0], vA[1] - vB[1]]
 
 {
   const t = subtractVectors([8,5], [5,9])
@@ -72,7 +72,7 @@ export const subtractVectors = (vA, vB) => vA.map((n, i) => n - vB[i])
 
 
 
-export const scaleVector = (v, s) => v.map(n => n * s)
+export const scaleVector = (v, s) => [v[0] * s, v[1] * s]
 {
   const t = scaleVector([1,2], 5)
   console.assert(t[0] === 5, 'scaleVector X')
@@ -109,7 +109,7 @@ export const rotate2DVector = ([x, y], th) => {
 
 
 export const vectorAngle = vec => {
-  return atan2(vec[0], vec[1])
+  return atan2(vec[1], vec[0])
 }
 
 

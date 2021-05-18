@@ -28,8 +28,8 @@ export const walkInput = (canvas, callback) => {
   const clear = () => ctx.clearRect(0, 0, width, height)
 
   const update = () => {
-    outX = x - cX
-    outY = cY - y
+    outX = 2* (x - cX) / width
+    outY = 2* (cY - y) / height
   }
 
   const release = () => {
@@ -61,6 +61,6 @@ export const walkInput = (canvas, callback) => {
   })
 
   return () => {
-    return [outX/width, -outY/height]
+    return [outX, outY]
   }
 }

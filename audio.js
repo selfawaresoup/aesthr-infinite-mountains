@@ -178,7 +178,7 @@ export const createAudioEnvironment = () => {
 
   return {
     listener: {
-      position: [1,1],
+      position: [0,0],
       orientation: [0,1]
     },
     audio: {

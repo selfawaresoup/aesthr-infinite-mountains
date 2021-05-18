@@ -4,7 +4,7 @@ import {
   disableAudioEntity,
   createAudioEnvironment,
   moveListenerBy,
-  rotateListenerTo,
+  rotateListenerBy,
   meter
 } from './audio.js';
 
@@ -56,18 +56,20 @@ const debugStats = () => {
   debug.textContent = `activeEntities: ${activeEntities.length}`
 }
 
-const input = walkInput(document.querySelector('#renderer'))
+const input = walkInput(document.querySelector('#camera'))
 const render = renderer(document.querySelector('#renderer'))
 const cameraRender = camera(document.querySelector('#camera'))
 const debug = document.querySelector('#debug-stats')
 
 const main = () => {
-  const moveVec = scaleVector(input(), 8)
+  const [xin, yin] = input()
+  const speed = yin * 2
+  const rotation = - xin / 8
   const oldPosition = aEnv.listener.position
   const range = 120
   
-  moveListenerBy(aEnv, moveVec)
-  rotateListenerTo(aEnv, moveVec)
+  moveListenerBy(aEnv, scaleVector(aEnv.listener.orientation, speed))
+  rotateListenerBy(aEnv, rotation)
   render.clear()
   render.grid()
   
@@ -77,14 +79,13 @@ const main = () => {
   activateEntities(oldPosition, newPosition, range)
   
   render.listener(aEnv.listener)
-  cameraRender.clear()
+  cameraRender.renderBuffer()
 
   activeEntities.forEach(ent => {
-    render.entity(ent.position, meter(ent))  
-    cameraRender.entity(aEnv, ent)
+    const m = meter(ent)
+    render.entity(ent.position, m)  
+    cameraRender.entity(aEnv, ent, m)
   })
-
-
 
   debugStats()
 }
