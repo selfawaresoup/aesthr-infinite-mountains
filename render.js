@@ -45,7 +45,7 @@ export const renderer = canvas => {
 
     ctx.fillStyle = `rgb(0, ${v}, 0)`
     ctx.fillRect(cx + x, cy - y, 10, 10)
-    
+    ctx.fillStyle = 'black'
     ctx.fillText(`${round(x,0)},${round(y, 0)}, ${round(vectorAngle([x,y]),2)}`, cx + x + 5, cy - y)
   }
 

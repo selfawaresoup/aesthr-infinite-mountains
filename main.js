@@ -60,13 +60,16 @@ const input = walkInput(document.querySelector('#camera'))
 const render = renderer(document.querySelector('#renderer'))
 const cameraRender = camera(document.querySelector('#camera'))
 const debug = document.querySelector('#debug-stats')
+const range = 120
+
+activateEntities([1000,1000], [0,0], range)
 
 const main = () => {
   const [xin, yin] = input()
   const speed = yin * 2
   const rotation = - xin / 8
   const oldPosition = aEnv.listener.position
-  const range = 120
+  
   
   moveListenerBy(aEnv, scaleVector(aEnv.listener.orientation, speed))
   rotateListenerBy(aEnv, rotation)
