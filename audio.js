@@ -1,7 +1,8 @@
 import {
   validateVector2,
   rotate2DVector,
-  addVectors
+  addVectors,
+  vectorAngle
 } from './vector.js';
 
 import { isFunction, random1 } from './lib.js';
@@ -174,7 +175,14 @@ export const createAudioEnvironment = () => {
   compressor.release.setValueAtTime(0.25, ctx.currentTime)
 
   gain.connect(compressor)
-  compressor.connect(ctx.destination)
+  
+  const splitter = ctx.createChannelSplitter(2)
+  const merger = ctx.createChannelMerger(2)
+  
+  compressor.connect(splitter)
+  splitter.connect(merger, 0, 1)
+  splitter.connect(merger, 1, 0)
+  merger.connect(ctx.destination)
 
   return {
     listener: {
@@ -207,6 +215,7 @@ export const rotateListenerBy = (env, th) => {
   const a = env.listener.orientation
   const b = rotate2DVector(a, th)
   env.listener.orientation = b
+  //console.log(vectorAngle(b))
   setAudioListenerDirection(env.audio.ctx, env.audio.lst, b)
 }
 
