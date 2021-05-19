@@ -13,7 +13,6 @@ export const camera = canvas => {
   const ctx = canvas.getContext('2d')
   const bounds = canvas.getBoundingClientRect()
   const { width, height } = canvas
-  ctx.font = '10px sans-serif';
 
   const scale = 10
 
@@ -77,11 +76,8 @@ export const camera = canvas => {
   return {
     entity: (env, ent, meter) => {
       const cameraAngle = vectorAngle(env.listener.orientation)
-      //ctx.fillStyle = 'green'
-      //ctx.fillText(`${cameraAngle}`, 10, 10)
       const translated = subtractVectors(ent.position, env.listener.position)
       const rotated = rotate2DVector(translated, -cameraAngle + PI/2)
-      //ctx.fillText(`${vectorAngle(rotated)}`, 10, 30)
       drawEntity(rotated, ent, meter)
     },
     renderBuffer,

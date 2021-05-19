@@ -180,7 +180,7 @@ export const createAudioEnvironment = () => {
   const merger = ctx.createChannelMerger(2)
   
   compressor.connect(splitter)
-  splitter.connect(merger, 0, 1)
+  splitter.connect(merger, 0, 1) // flip channels because coordinate system is flipped for rendering
   splitter.connect(merger, 1, 0)
   merger.connect(ctx.destination)
 
