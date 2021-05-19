@@ -51,7 +51,7 @@ export const circleCells = (vec, r) => {
 }
 
 
-const gridValueOffset = 80000
+const gridValueOffset = 20000
 const gridValueRange = 1000
 export const gridValue = vec => {
   const r = random2(vec[0], vec[1], gridValueOffset + gridValueRange) - gridValueOffset

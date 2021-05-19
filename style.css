@@ -14,10 +14,9 @@ body {
 }
 
 #camera {
-  width: 800px;
-  height: 600px;
-
+  image-rendering: pixelated;
   border: 1px solid purple;
+  background-color: white;
 }
 
 #debug-stats {

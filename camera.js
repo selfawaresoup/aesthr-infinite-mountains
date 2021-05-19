@@ -7,11 +7,12 @@ import {
   addVectors
 } from './vector.js';
 
-const { floor, PI }  = Math
+import { round } from './lib.js'
+
+const { floor, PI, pow, exp }  = Math
 
 export const camera = canvas => {
   const ctx = canvas.getContext('2d')
-  const bounds = canvas.getBoundingClientRect()
   const { width, height } = canvas
 
   const scale = 10
@@ -20,10 +21,12 @@ export const camera = canvas => {
   const bufferHeight = height / scale
   const bufferLength = bufferWidth * bufferHeight
   const buffer = Array.from({length: bufferLength}).fill(0)
-  let oldBuffer = Array.from({length: bufferLength}).fill(0)
+  const nextBuffer = Array.from({length: bufferLength}).fill(0)
   const bufferOrigin = [bufferWidth/2, bufferHeight - 10]
 
-  const clear = () => ctx.clearRect(0, 0, bounds.width, bounds.height)
+  const clear = () => {
+    ctx.clearRect(0, 0, width, height)
+  }
 
   const [originX, originY] = bufferOrigin
 
@@ -35,42 +38,80 @@ export const camera = canvas => {
     }
     return by * bufferWidth + bx
   }
-  console.log(bufferWidth, bufferHeight, bufferOrigin ,bufferOffset([2,0]))
-
-  const drawEntity = (vec, ent, value) => {
+  
+  const drawEntity = (vec, value) => {
     const scaled = scaleVector(vec, 0.1)
-    const range = 5
+    const range = 6
     for (let y = -range; y <= range; y++) {
       for (let x = -range; x <= range; x++) {
-        const d = 4 * vectorLength([x,y]) + 1
-        const adjusted = value / d
+        const distance = vectorLength([x,y]) - 1
+        const c = 1
+        const adjusted = 0.8 * value * exp(-pow(distance, 2) / (2 * pow(c,2))) // gaussian curve
         setBufferValue(addVectors(scaled, [x,y]), adjusted)
       }
     }
   }
-
 
   const setBufferValue = (vec, value) => {
     const offset = bufferOffset(vec)
     if (offset < 0 || offset >= bufferLength) {
       return
     }
-    buffer[offset] += value
+    nextBuffer[offset] += value
   }
 
-  const renderBuffer = () => {
-    buffer.forEach((newValue, i) => {
+  const renderBufferGrid = () => {
+    buffer.forEach((n, i) => {
       const x = scale * (i % bufferWidth)
       const y = scale * floor(i / bufferWidth)
-
-      const oldValue = oldBuffer[i]
-      const n = oldValue + (newValue - oldValue) / 10
-      oldBuffer[i] = n
-
       ctx.fillStyle = `rgb(${n}, 0,0)`
       ctx.fillRect(x, y, scale, scale)
     })
-    buffer.fill(0)
+  }
+
+  const renderCurves = () => {
+    clear()
+    const xScale = scale
+    const yScale = 8
+    const frontScale = 2.0
+    const rearScale = 0.5
+
+    for (let by = 0; by < bufferHeight; by++) {
+      const y = height - yScale * (bufferHeight - by)
+      const lineScale = rearScale + frontScale * (by) / bufferHeight
+
+      ctx.beginPath()
+      ctx.strokeStyle = 'black'
+      ctx.fillStyle = 'white'
+      ctx.moveTo(0, y)
+      
+      for (let bx = 0; bx <= bufferWidth; bx++) {
+        const x = (width - lineScale * width) / 2 + lineScale * xScale * bx 
+        const v = buffer[by * bufferWidth + bx]
+        ctx.lineTo(x, y - 0.2*v)
+      }
+
+      ctx.lineTo(width, y)
+      ctx.lineTo(width, height)
+      ctx.lineTo(0,height)
+      ctx.fill()
+      ctx.stroke()
+      ctx.closePath()
+      
+    }
+  }
+
+  const renderBuffer = () => {
+    nextBuffer.forEach((newValue, i) => {
+      const oldValue = buffer[i]
+      const n = oldValue + (newValue - oldValue) / 1.5
+      buffer[i] = n
+    })
+
+    
+    renderCurves()
+    //renderBufferGrid()
+    nextBuffer.fill(0)
   }
 
   return {
@@ -78,7 +119,7 @@ export const camera = canvas => {
       const cameraAngle = vectorAngle(env.listener.orientation)
       const translated = subtractVectors(ent.position, env.listener.position)
       const rotated = rotate2DVector(translated, -cameraAngle + PI/2)
-      drawEntity(rotated, ent, meter)
+      drawEntity(rotated, meter)
     },
     renderBuffer,
     clear

@@ -59,7 +59,7 @@ const createGain = (ctx, g = 0.5) => {
 
 export const createAudioEntity = (position, seed) => {
   validateVector2(position)
-  const g = random1(seed, 1000) / 1000 + 0.2
+  const g = random1(seed, 1000) / 1000
 
   return {
     position: position,
@@ -165,7 +165,7 @@ export const createAudioEnvironment = () => {
   setAudioListenerPosition(ctx, lst, [1,1])
   setAudioListenerDirection(ctx, lst, [0,-1])
 
-  const gain = createGain(ctx, 1)
+  const gain = createGain(ctx, 2)
 
   const compressor = ctx.createDynamicsCompressor()
   compressor.threshold.setValueAtTime(-50, ctx.currentTime)

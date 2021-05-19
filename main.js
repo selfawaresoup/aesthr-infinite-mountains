@@ -57,10 +57,10 @@ const debugStats = () => {
 }
 
 const input = walkInput(document.querySelector('#camera'))
-const render = renderer(document.querySelector('#renderer'))
+//const render = renderer(document.querySelector('#renderer'))
 const cameraRender = camera(document.querySelector('#camera'))
 const debug = document.querySelector('#debug-stats')
-const range = 120
+const range = 160
 
 activateEntities([1000,1000], [0,0], range)
 
@@ -73,23 +73,23 @@ const main = () => {
   
   moveListenerBy(aEnv, scaleVector(aEnv.listener.orientation, speed))
   rotateListenerBy(aEnv, rotation)
-  render.clear()
-  render.grid()
+  //render.clear()
+  //render.grid()
   
   const newPosition = aEnv.listener.position
   
   deactivateEntities(newPosition, range)
   activateEntities(oldPosition, newPosition, range)
   
-  render.listener(aEnv.listener)
-  cameraRender.renderBuffer()
-
+  //render.listener(aEnv.listener)
+  
   activeEntities.forEach(ent => {
     const m = meter(ent)
-    render.entity(ent.position, m)  
+    //render.entity(ent.position, m)  
     cameraRender.entity(aEnv, ent, m)
   })
 
+  cameraRender.renderBuffer()
   debugStats()
 }
 
