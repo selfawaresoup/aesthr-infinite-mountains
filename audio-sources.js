@@ -1,5 +1,6 @@
 import { random1 } from './lib.js';
 
+const { pow } = Math
 
 const pitches = [
   261.63, //c
@@ -61,16 +62,22 @@ export const noteByNumber = n => {
 }
 
 export const createAudioSource = (ctx, seed) => {
-  const type = 4//random1(seed, 6)
+  const s2 = random1(seed, 1000)
+  const type = random1(seed, 3)
+  const ping = random1(s2, 27) > 1
 
-  return [
+
+  const source = [
     createConstantSine,
     createPulsingSine,
-    createPulsingFilteredSquare,
-    createPingingSine,
-    createPingingSine,
-    createPingingSine
-  ][type](ctx, seed)
+    createPulsingFilteredSquare
+  ][type](ctx,seed)
+
+  if (ping) {
+    return applyPinging(ctx, seed)(source)
+  } else {
+    return source
+  }
 }
 
 const createOscillator = (ctx, freq) => {
@@ -117,7 +124,7 @@ const createPulsingSine = (ctx, seed) => {
 
 const createPulsingFilteredSquare = (ctx, seed) => {
   const r1 = random1(seed, 10)
-  const r2 = random1(r1, 50) + 5
+  const r2 = random1(r1, 100) + 5
   const r3 = random1(r2, 1000) + 50
 
   const osc = ctx.createOscillator()
@@ -149,17 +156,16 @@ const createPulsingFilteredSquare = (ctx, seed) => {
   return [filter, lfo, baseFilterFreq, attenuator, osc]
 }
 
-const createPingingSine = (ctx, seed) => {
-  const r1 = random1(seed, 5000) + 500
-  const r2 = random1(r1, 1000) + 500
+const applyPinging = (ctx, seed) => (source) => {
+  const r1 = random1(seed, 5000) + 1000
+  const r2 = pow(random1(r1, 1000) / 1000, 4) * 1000
 
-  const freq = noteByNumber(seed)
-  const osc = createOscillator(ctx, freq)
+  const sourceOut = source[0]
 
   const gain = ctx.createGain()
   gain.gain.value = 0
 
-  osc.connect(gain)
+  sourceOut.connect(gain)
 
   const timeout = setInterval(() => {
     gain.gain.setTargetAtTime(2, ctx.currentTime, 0.01)
@@ -170,5 +176,6 @@ const createPingingSine = (ctx, seed) => {
     stop: () => clearInterval(timeout)
   }
 
-  return [gain, osc, timer]
+  return [gain, timer, ...source]
+
 }

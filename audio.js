@@ -9,7 +9,7 @@ import { isFunction, random1 } from './lib.js';
 
 import { createAudioSource } from './audio-sources.js';
 
-const { max } = Math
+const { max, pow } = Math
 
 const setAudioListenerPosition = (ctx, lst, v) => {
   validateVector2(v)
@@ -33,7 +33,7 @@ const setAudioListenerDirection = (ctx, lst, v) => {
 
 const createPanner = (ctx) => {
   const pan = ctx.createPanner()
-  pan.panningModel = 'equalpower'
+  pan.panningModel = 'hrtf'
   pan.distanceModel = 'exponential'
   pan.refDistance = 1
   pan.maxDistance = 80
@@ -59,7 +59,7 @@ const createGain = (ctx, g = 0.5) => {
 
 export const createAudioEntity = (position, seed) => {
   validateVector2(position)
-  const g = random1(seed, 1000) / 1000
+  const g = pow(random1(seed, 1000) / 1000, 8)
 
   return {
     position: position,
@@ -165,12 +165,12 @@ export const createAudioEnvironment = () => {
   setAudioListenerPosition(ctx, lst, [1,1])
   setAudioListenerDirection(ctx, lst, [0,-1])
 
-  const gain = createGain(ctx, 2)
+  const gain = createGain(ctx, 4)
 
   const compressor = ctx.createDynamicsCompressor()
-  compressor.threshold.setValueAtTime(-50, ctx.currentTime)
-  compressor.knee.setValueAtTime(40, ctx.currentTime)
-  compressor.ratio.setValueAtTime(12, ctx.currentTime)
+  compressor.threshold.setValueAtTime(-40, ctx.currentTime)
+  compressor.knee.setValueAtTime(0, ctx.currentTime)
+  compressor.ratio.setValueAtTime(24, ctx.currentTime)
   compressor.attack.setValueAtTime(0, ctx.currentTime)
   compressor.release.setValueAtTime(0.25, ctx.currentTime)
 

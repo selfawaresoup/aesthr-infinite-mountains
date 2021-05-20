@@ -7,7 +7,7 @@ import {
   addVectors
 } from './vector.js';
 
-import { round } from './lib.js'
+import { random1 } from './lib.js'
 
 const { floor, PI, pow, exp }  = Math
 
@@ -39,14 +39,15 @@ export const camera = canvas => {
     return by * bufferWidth + bx
   }
   
-  const drawEntity = (vec, value) => {
+  const drawEntity = (vec, value, seed) => {
     const scaled = scaleVector(vec, 0.1)
-    const range = 6
+    const range = 10
     for (let y = -range; y <= range; y++) {
       for (let x = -range; x <= range; x++) {
         const distance = vectorLength([x,y]) - 1
-        const c = 1
-        const adjusted = 0.8 * value * exp(-pow(distance, 2) / (2 * pow(c,2))) // gaussian curve
+        const c = 1 + random1(seed, 100) / 40
+        const vsqr = pow(value / 256, 2) * 256
+        const adjusted = 1.4 * vsqr * exp(-pow(distance, 2) / (2 * pow(c,2))) // gaussian curve
         setBufferValue(addVectors(scaled, [x,y]), adjusted)
       }
     }
@@ -133,7 +134,7 @@ export const camera = canvas => {
       const cameraAngle = vectorAngle(env.listener.orientation)
       const translated = subtractVectors(ent.position, env.listener.position)
       const rotated = rotate2DVector(translated, -cameraAngle + PI/2)
-      drawEntity(rotated, meter)
+      drawEntity(rotated, meter, ent.seed)
     },
     renderBuffer,
     clear
