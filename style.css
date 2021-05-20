@@ -6,6 +6,7 @@ body {
   text-align: center;
   max-width: 1000px;
   margin: 0 auto;
+  font-family: monospace;
 }
 
 #renderer {
@@ -27,4 +28,10 @@ body {
   margin: 0 auto;
   font-family: monospace;
   text-align: left;
+}
+
+button {
+  border: 1px solid black;
+  background-color: white;
+  font-family: inherit;
 }
