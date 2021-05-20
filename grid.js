@@ -5,8 +5,6 @@ const {pow, floor} = Math
 
 const gridSize = 10
 
-
-
 const cellOnPosition = vec => vec.map(x => {
   const a = x < 0 ? -1 : 1
   const b = x < 0 ? gridSize : 0
@@ -51,9 +49,10 @@ export const circleCells = (vec, r) => {
 }
 
 
+const initalSeed = 7
 const gridValueOffset = 40000
 const gridValueRange = 1000
 export const gridValue = vec => {
-  const r = random2(vec[0], vec[1], gridValueOffset + gridValueRange) - gridValueOffset
+  const r = random2(vec[0] + initalSeed, vec[1], gridValueOffset + gridValueRange) - gridValueOffset
   return r > 0 ? r : 0
 }

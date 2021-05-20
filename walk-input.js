@@ -1,15 +1,17 @@
 export const walkInput = (canvas, callback) => {
   const ctx = canvas.getContext('2d')
   const {width, height, left, top} = canvas.getBoundingClientRect()
-  const cX = width / 2
-  const cY = height / 2
+  let cX = width / 2
+  let cY = height / 2
   let outX = 0
   let outY = 0
   let x = cX
   let y = cY
   let active = false
 
-  canvas.addEventListener('mousedown', () => {
+  canvas.addEventListener('mousedown', (ev) => {
+    cX = ev.clientX - left
+    cY = ev.clientY - top
     active = true
     update()
     //draw()

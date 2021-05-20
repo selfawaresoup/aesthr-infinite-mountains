@@ -66,7 +66,7 @@ activateEntities([1000,1000], [0,0], range)
 
 const main = () => {
   const [xin, yin] = input()
-  const speed = yin * 2
+  const speed = yin * 4
   const rotation = - xin / 8
   const oldPosition = aEnv.listener.position
   
@@ -96,9 +96,7 @@ const main = () => {
 setInterval(main, 1000/30)
 
 
-
-
-
-
 document.querySelector('#audio-start').addEventListener('click', () => aEnv.audio.ctx.resume())
 document.querySelector('#audio-stop').addEventListener('click', () => aEnv.audio.ctx.suspend())
+
+document.querySelector('#audio-start').disabled = false
