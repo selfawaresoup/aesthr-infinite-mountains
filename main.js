@@ -59,8 +59,8 @@ const debugStats = () => {
 const input = walkInput(document.querySelector('#camera'))
 //const render = renderer(document.querySelector('#renderer'))
 const cameraRender = camera(document.querySelector('#camera'))
-const debug = document.querySelector('#debug-stats')
-const range = 160
+//const debug = document.querySelector('#debug-stats')
+const range = 240
 
 activateEntities([1000,1000], [0,0], range)
 
@@ -90,7 +90,7 @@ const main = () => {
   })
 
   cameraRender.renderBuffer()
-  debugStats()
+  //debugStats()
 }
 
 setInterval(main, 1000/30)

@@ -76,24 +76,38 @@ export const camera = canvas => {
     const frontScale = 2.0
     const rearScale = 0.5
 
+    ctx.strokeStyle = 'rgba(10,0,50,0.5)'
+    ctx.fillStyle = 'rgba(255, 255, 255, 1.0)'
+    ctx.shadowColor = 'rgba(255,0,120,0.4)'
+    ctx.shadowBlur = 5
+
     for (let by = 0; by < bufferHeight; by++) {
       const y = height - yScale * (bufferHeight - by)
       const lineScale = rearScale + frontScale * (by) / bufferHeight
 
       ctx.beginPath()
-      ctx.strokeStyle = 'black'
-      ctx.fillStyle = 'white'
-      ctx.moveTo(0, y)
+      ctx.moveTo(-10, y)
+
+      let prevX = 0
+      let prevY = y
       
       for (let bx = 0; bx <= bufferWidth; bx++) {
         const x = (width - lineScale * width) / 2 + lineScale * xScale * bx 
         const v = buffer[by * bufferWidth + bx]
-        ctx.lineTo(x, y - 0.2*v)
+        const yv = y - 0.2*v
+        //ctx.lineTo(x, yv)
+        const controlX1 = prevX + (x - prevX) / 2.5
+        const controlY1 = prevY
+        const controlX2 = x - (x - prevX) / 2.5
+        const controlY2 = yv
+        ctx.bezierCurveTo(controlX1, controlY1, controlX2, controlY2, x, yv)
+        prevX = x
+        prevY = yv
       }
 
-      ctx.lineTo(width, y)
-      ctx.lineTo(width, height)
-      ctx.lineTo(0,height)
+      ctx.lineTo(width + 10, y)
+      ctx.lineTo(width + 10, height + 10)
+      ctx.lineTo(-10, height + 10)
       ctx.fill()
       ctx.stroke()
       ctx.closePath()

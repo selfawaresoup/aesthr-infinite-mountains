@@ -14,8 +14,9 @@ body {
 }
 
 #camera {
+  width: 100%;
   image-rendering: pixelated;
-  border: 1px solid purple;
+  /* border: 1px solid purple; */
   background-color: white;
 }
 
